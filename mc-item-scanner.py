@@ -57,11 +57,16 @@ def region_search(region_file):
 
 def player_inventory_search(data_file):
     def search_shulker_box_item(shulker_box):
-        if "Items" not in shulker_box["tag"]["BlockEntityTag"]:
-            return
-        for item in shulker_box["tag"]["BlockEntityTag"]["Items"]:
-            count_item(item["id"], int(item["Count"]))
+        try:
+            if "Items" not in shulker_box["tag"]["BlockEntityTag"]:
+                return
+            for item in shulker_box["tag"]["BlockEntityTag"]["Items"]:
+                count_item(item["id"], int(item["Count"]))
             # print(item["id"], " ", item["Count"])
+        except KeyError as e:
+            print(f"KeyError: {e}")
+            print(data_file)
+            print(shulker_box)
 
     target_file = nbtlib.load(data_file)
 
