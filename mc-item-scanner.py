@@ -4,6 +4,7 @@ from anvil.errors import ChunkNotFound
 import os
 import argparse
 import csv
+import time
 
 
 aparser = argparse.ArgumentParser(description=r"path of \world")
@@ -26,11 +27,16 @@ def count_item(item_id, item_count: int):
 
 def region_search(region_file):
     def search_shulker_box_item(shulker_box):
-        if "Items" not in shulker_box["tag"]["BlockEntityTag"]:
-            return
-        for item in shulker_box["tag"]["BlockEntityTag"]["Items"]:
-            count_item(item["id"], int(str(item["Count"])))
-            # print(item["id"], " ", item["Count"])
+        try:
+            if "Items" not in shulker_box["tag"]["BlockEntityTag"]:
+                return
+            for item in shulker_box["tag"]["BlockEntityTag"]["Items"]:
+                count_item(item["id"], int(str(item["Count"])))
+                # print(item["id"], " ", item["Count"])
+        except KeyError as k:
+            print(f"KeyError: {k}")
+            print(target_region)
+            print(shulker_box)
 
     target_region = anvil.Region.from_file(region_file)
 
@@ -84,6 +90,7 @@ def player_inventory_search(data_file):
 
 
 def main():
+    start_time = time.time()
     if not os.path.isdir(PATH_OUTDIR):
         raise NotADirectoryError("the outdirectory specified is not a directory")
 
@@ -129,6 +136,8 @@ def main():
         writer.writerow(["item", "count"])
         for i in item_record.items():
             writer.writerow(list(i))
+
+    print(f"completed! Using {time.time() - start_time} seconds")
 
 
 if __name__ == '__main__':
